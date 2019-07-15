@@ -10,15 +10,6 @@ defmodule Gameday.TeamsTest do
     @update_attrs %{name: "some updated name", location: "some updated location"}
     @invalid_attrs %{id: nil, name: nil, location: nil}
 
-    def team_fixture(attrs \\ %{}) do
-      {:ok, team} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Teams.create_team()
-
-      team
-    end
-
     test "list_teams/0 returns all teams" do
       team = insert(:team)
       assert Teams.list_teams() == [team]
