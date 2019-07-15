@@ -22,6 +22,7 @@ defmodule Gameday.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Gameday.DataCase
+      import Gameday.Factory
     end
   end
 
