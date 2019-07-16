@@ -3,10 +3,20 @@ defmodule Gameday.Schedule do
   The Schedule context.
   """
 
+  require Logger
+
   import Ecto.Query, warn: false
+  alias Ecto.Multi
   alias Gameday.Repo
 
-  alias Gameday.Schedule.Game
+  alias Gameday.Schedule.{Game, MlbApiClient}
+  alias Gameday.Teams
+  alias Gameday.Teams.Team
+
+  @game_on_conflict [
+    on_conflict: {:replace, [:scheduled_datetime, :updated_at]},
+    conflict_target: [:scheduled_datetime, :home_team_id]
+  ]
 
   @doc """
   Returns the list of games.
@@ -52,7 +62,7 @@ defmodule Gameday.Schedule do
   def create_game(attrs \\ %{}) do
     %Game{}
     |> Game.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert(@game_on_conflict)
   end
 
   @doc """
@@ -100,5 +110,35 @@ defmodule Gameday.Schedule do
   """
   def change_game(%Game{} = game) do
     Game.changeset(game, %{})
+  end
+
+  def save_mlb_season(season) do
+    Teams.list_teams()
+    |> Enum.map(fn %Team{id: team_id} -> team_id end)
+    |> MlbApiClient.get_teams_with_team_code()
+    |> Enum.map(fn team ->
+      Task.async(fn -> MlbApiClient.get_api_team_schedule(team, season) end)
+    end)
+    |> Enum.map(&Task.await/1)
+    |> Enum.map(&save_season_season(&1))
+  end
+
+  defp save_team_season(games) do
+    {:ok, _} =
+      games
+      |> Enum.map(fn game -> %Game{} |> Game.changeset(game) end)
+      |> Enum.with_index()
+      |> Enum.reduce(Multi.new(), fn {game_changeset, index}, multi ->
+        Multi.insert(
+          multi,
+          {:game, index},
+          game_changeset,
+          @game_on_conflict
+        )
+      end)
+      |> Repo.transaction()
+
+    [%{home_team_id: home_team_id} | _rest] = games
+    Logger.info("Successfully saved schedule for team #{home_team_id} at #{DateTime.utc_now()}")
   end
 end

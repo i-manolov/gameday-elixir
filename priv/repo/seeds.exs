@@ -2,10 +2,10 @@
 #
 #     mix run priv/repo/seeds.exs
 #
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     Gameday.Repo.insert!(%Gameday.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+alias Gameday.{Repo, Teams.Team}
+# alias Gameday.Teams.Game
+
+if Repo.get(Team, "mets") == nil do
+  Repo.insert!(%Team{id: "nym", name: "mets", location: "new york"})
+  Repo.insert!(%Team{id: "nyy", name: "yankees", location: "new york"})
+end

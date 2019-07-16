@@ -17,6 +17,6 @@ defmodule Gameday.Schedule.Game do
     |> cast(attrs, [:home_team_id, :scheduled_datetime])
     |> validate_required([:home_team_id, :scheduled_datetime])
     |> assoc_constraint(:team)
-    |> unique_constraint(:scheduled_datetime, name: :games_team_id_scheduled_datetime_index)
+    |> unique_constraint(:scheduled_datetime, name: :games_home_team_id_scheduled_datetime_index)
   end
 end
