@@ -20,7 +20,7 @@ defmodule Gameday.MixProject do
   def application do
     [
       mod: {Gameday.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :timex]
     ]
   end
 
@@ -47,7 +47,8 @@ defmodule Gameday.MixProject do
       {:tesla, "~> 1.2.0"},
       # optional, but recommended adapter
       {:hackney, "~> 1.14.0"},
-      {:mox, "~> 0.5", only: :test}
+      {:mox, "~> 0.5", only: :test},
+      {:timex, "~> 3.0"}
     ]
   end
 
