@@ -8,7 +8,7 @@ defmodule Gameday.Schedule.FetchWorker do
 
   require Logger
 
-  alias Gameday.{Schedule, Teams}
+  alias Gameday.Schedule
 
   def start_link(_state) do
     GenServer.start_link(__MODULE__, %{})
