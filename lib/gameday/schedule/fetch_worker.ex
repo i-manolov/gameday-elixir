@@ -37,7 +37,7 @@ defmodule Gameday.Schedule.FetchWorker do
     now = Timex.now()
     waiting_period = calculate_waiting_period(now)
 
-    Logger.debug(
+    Logger.info(
       "***Scheduling*** Next job: " <>
         DateTime.to_string(Timex.add(now, Timex.Duration.from_milliseconds(waiting_period)))
     )
