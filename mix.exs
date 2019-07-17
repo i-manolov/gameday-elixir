@@ -20,7 +20,7 @@ defmodule Gameday.MixProject do
   def application do
     [
       mod: {Gameday.Application, []},
-      extra_applications: [:logger, :runtime_tools, :timex]
+      extra_applications: [:logger, :runtime_tools, :timex, :ueberauth, :ueberauth_github]
     ]
   end
 
@@ -48,7 +48,11 @@ defmodule Gameday.MixProject do
       # optional, but recommended adapter
       {:hackney, "~> 1.14.0"},
       {:mox, "~> 0.5", only: :test},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:ueberauth, "~> 0.6"},
+      {:ueberauth_github, "~> 0.7"},
+      # Stupid hack since oauth2 v0.9 depends on poison
+      {:poison, "~> 3.1"}
     ]
   end
 
