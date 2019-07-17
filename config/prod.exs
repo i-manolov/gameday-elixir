@@ -16,6 +16,8 @@ config :gameday, GamedayWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :gameday, enable_http_workers: true
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

@@ -6,15 +6,21 @@ defmodule Gameday.Application do
   use Application
 
   def start(_type, _args) do
+    http_workers =
+      if Application.get_env(:gameday, :enable_http_workers, false),
+        do: [Gameday.Schedule.FetchWorker],
+        else: []
+
     # List all child processes to be supervised
-    children = [
-      # Start the Ecto repository
-      Gameday.Repo,
-      # Start the endpoint when the application starts
-      GamedayWeb.Endpoint
-      # Starts a worker by calling: Gameday.Worker.start_link(arg)
-      # {Gameday.Worker, arg},
-    ]
+    children =
+      [
+        # Start the Ecto repository
+        Gameday.Repo,
+        # Start the endpoint when the application starts
+        GamedayWeb.Endpoint
+        # Starts a worker by calling: Gameday.Worker.start_link(arg)
+        # {Gameday.Worker, arg},
+      ] ++ http_workers
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
