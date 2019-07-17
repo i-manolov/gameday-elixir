@@ -19,6 +19,15 @@ defmodule GamedayWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/auth", GamedayWeb do
+    pipe_through(:browser)
+
+    put("/signout", AuthController, :signout)
+    get("/:provider", AuthController, :request)
+    get("/:provider/callback", AuthController, :callback)
+  end
+
+
   # Other scopes may use custom stacks.
   # scope "/api", GamedayWeb do
   #   pipe_through :api
