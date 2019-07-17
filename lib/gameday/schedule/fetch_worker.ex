@@ -34,25 +34,23 @@ defmodule Gameday.Schedule.FetchWorker do
   end
 
   defp schedule_work do
-    current_date_time = Timex.now()
-
-    next_day_date_time =
-      current_date_time
-      |> Timex.shift(days: 1)
-      |> Timex.beginning_of_day()
-
-    Logger.debug("***Scheduling*** Running at: " <> DateTime.to_string(DateTime.utc_now()))
-
-    waiting_period = Timex.diff(next_day_date_time, current_date_time, :milliseconds)
+    now = Timex.now()
+    waiting_period = calculate_waiting_period(now)
 
     Logger.debug(
       "***Scheduling*** Next job: " <>
-        DateTime.to_string(
-          Timex.add(current_date_time, Timex.Duration.from_milliseconds(waiting_period))
-        )
+        DateTime.to_string(Timex.add(now, Timex.Duration.from_milliseconds(waiting_period)))
     )
 
     Process.send_after(self(), :work, waiting_period)
+  end
+
+  def calculate_waiting_period(now) do
+    now
+    |> Timex.shift(days: 1)
+    |> Timex.beginning_of_day()
+    |> Timex.shift(seconds: 1)
+    |> Timex.diff(now, :milliseconds)
   end
 
   defp save_current_season_schedule do
