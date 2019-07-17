@@ -11,7 +11,6 @@ defmodule Gameday.Schedule do
 
   alias Gameday.Schedule.{Game, MlbApiClient}
   alias Gameday.Teams
-  alias Gameday.Teams.Team
 
   @game_on_conflict [
     on_conflict: {:replace, [:scheduled_datetime, :updated_at]},
@@ -114,13 +113,12 @@ defmodule Gameday.Schedule do
 
   def save_mlb_season(season) do
     Teams.list_teams()
-    |> Enum.map(fn %Team{id: team_id} -> team_id end)
-    |> MlbApiClient.get_teams_with_team_code()
+    |> MlbApiClient.get_api_team_codes()
     |> Enum.map(fn team ->
       Task.async(fn -> MlbApiClient.get_api_team_schedule(team, season) end)
     end)
     |> Enum.map(&Task.await/1)
-    |> Enum.map(&save_season_season(&1))
+    |> Enum.map(&save_team_season(&1))
   end
 
   defp save_team_season(games) do

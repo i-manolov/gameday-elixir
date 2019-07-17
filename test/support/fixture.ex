@@ -1,4 +1,4 @@
-defmodule Gameday.Fixtures do
+defmodule Gameday.Fixture do
   def fixture(:mlb_api_teams) do
     %{
       "copyright" =>

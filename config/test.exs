@@ -16,3 +16,5 @@ config :gameday, GamedayWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :tesla, Gameday.Schedule.MlbApiClient, adapter: Gameday.Schedule.MlbApiClient.Mock

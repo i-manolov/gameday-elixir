@@ -1,6 +1,9 @@
 defmodule Gameday.ScheduleTest do
   use Gameday.DataCase
 
+  import Mox
+  import Gameday.Fixture
+
   alias Gameday.Schedule
 
   describe "games" do
@@ -69,6 +72,38 @@ defmodule Gameday.ScheduleTest do
     test "change_game/1 returns a game changeset", context do
       game = game_fixture(context)
       assert %Ecto.Changeset{} = Schedule.change_game(game)
+    end
+  end
+
+  describe "schedule" do
+    alias Gameday.Teams
+
+    setup :verify_on_exit!
+
+    test "save_mlb_season/1 saves schedule successfully" do
+      insert(:team, id: "nym")
+
+      Gameday.Schedule.MlbApiClient.Mock
+      |> expect(:call, fn
+        %{url: "https://statsapi.mlb.com/api/v1/teams?sportId=1"}, _opts ->
+          {:ok, %Tesla.Env{status: 200, body: fixture(:mlb_api_teams)}}
+      end)
+      |> expect(:call, fn
+        %{
+          url:
+            "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=01/01/2019&endDate=12/31/2019&gameType=R&teamId=121"
+        },
+        _opts ->
+          {:ok, %Tesla.Env{status: 200, body: fixture(:mlb_api_schedule)}}
+      end)
+
+      Schedule.save_mlb_season(2019)
+
+      [game1, game2 | []] = Schedule.list_games()
+      assert game1.home_team_id == "nym"
+      assert game1.scheduled_datetime == ~U[2019-03-28 17:05:00Z]
+      assert game2.home_team_id == "nym"
+      assert game2.scheduled_datetime == ~U[2019-03-30 17:05:00Z]
     end
   end
 end
