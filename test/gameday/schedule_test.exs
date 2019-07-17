@@ -75,9 +75,7 @@ defmodule Gameday.ScheduleTest do
     end
   end
 
-  describe "schedule" do
-    alias Gameday.Teams
-
+  describe "fetch schedule" do
     setup :verify_on_exit!
 
     test "save_mlb_season/1 saves schedule successfully" do
